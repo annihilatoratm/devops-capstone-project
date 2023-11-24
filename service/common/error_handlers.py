@@ -41,10 +41,18 @@ def not_found(error):
 
 
 @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
-def test_method_not_allowed(self):
-    """It should not allow an illegal method call"""
-    resp = self.client.delete(BASE_URL)
-    self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+def method_not_supported(error):
+    """Handles unsupported HTTP methods with 405_METHOD_NOT_SUPPORTED"""
+    message = str(error)
+    app.logger.warning(message)
+    return (
+        jsonify(
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            error="Method not Allowed",
+            message=message,
+        ),
+        status.HTTP_405_METHOD_NOT_ALLOWED,
+    )
 
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -63,7 +71,15 @@ def mediatype_not_supported(error):
 
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
-def test_method_not_allowed(self):
-    """It should not allow an illegal method call"""
-    resp = self.client.delete(BASE_URL)
-    self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+def internal_server_error(error):
+    """Handles unexpected server error with 500_SERVER_ERROR"""
+    message = str(error)
+    app.logger.error(message)
+    return (
+        jsonify(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            error="Internal Server Error",
+            message=message,
+        ),
+        status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
